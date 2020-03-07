@@ -4,7 +4,7 @@ struct Matrix{
     int nFilas, nColumnas;
     char Nombre[17];
 };
-void scanMatrix(struct Matrix *mat){
+void scanMatrix(struct Matrix *mat, int *nMatrices){
     int i, j;
     printf("\nIntroduzca el numero de filas de la matriz: ");
     scanf("%d", &mat->nFilas);
@@ -17,7 +17,10 @@ void scanMatrix(struct Matrix *mat){
         }
     }
     printf("Introduzca el nombre de la matriz: ");
-    scanf("%s",mat->Nombre); //pasar otra vez los chars a string...
+    scanf("%s",mat->Nombre);
+    (*nMatrices)++;
+    printf("\n\nGuardada en la matriz como '%s'", mat->Nombre);
+    printf("\nAhora tienes guardadas %d matrices\n", *nMatrices);
 }
 void printMatrix(struct Matrix mat){
     printf("\n\nMatriz '%s'\n", mat.Nombre);
@@ -29,15 +32,24 @@ void printMatrix(struct Matrix mat){
         printf("|\n");
     }
 }
-int nombresIguales(struct Matrix *mat,char selectn[]){//permite utilizar strcmp en if's de forma mas comoda
-    if(strcmp(selectn,mat->Nombre)!=0) return 0;
+void listMatrix(struct Matrix *Matriz, int nMatrices){
+    if(nMatrices==0)printf("\nNo existe ninguna matriz guardada\n");
+    else{
+        printf("Hay %d matrices guardadas: \n",nMatrices);
+        int i;
+        for(i=0; i<nMatrices; i++){
+            printMatrix(Matriz[i]);
+        }
+    }
+}
+int nombresIguales(struct Matrix mat,char selectn[]){//permite utilizar strcmp en if's de forma mas comoda
+    if(strcmp(selectn,mat.Nombre)!=0) return 0;
     else return 1;
 }
 int selectMatrix(struct Matrix *Matriz,int nMatrices, char selectn[]){
     int i;
     for (i=0; i<nMatrices;i++){
-        struct Matrix *mat=(Matriz+i);
-        if(nombresIguales(mat,selectn))return i;
+        if(nombresIguales(Matriz[i],selectn))return i;
     }
     return -1;
 }
@@ -45,6 +57,16 @@ int chooseMatrix(struct Matrix *Matriz,int nMatrices){
     char selectn1[17];
     scanf("%s", selectn1);
     return selectMatrix(Matriz, nMatrices, selectn1);
+}
+void delMatrix(struct Matrix *Matriz, int *nMatrices){
+    int aux, i;
+    aux=chooseMatrix(Matriz, *nMatrices);
+    if(aux==-1) printf("ERROR: Matriz no encontrada.");
+    else{
+        for(i=aux; i<(*nMatrices)-1;i++) Matriz[i]=Matriz[i+1];
+        (*nMatrices)--;
+        printf("\nMatriz eliminada con exito, lista de matrices actualizada (opcion 2.)\n\n");
+    }
 }
 int ynquest(){
     char res;
